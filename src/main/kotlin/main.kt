@@ -1,5 +1,5 @@
 fun main() {
-    countCommission(CardType.Maestro, 75_500, 6_500, 1_000)
+    countCommission(CardType.Maestro, 75_500, 6_550, 1_000)
 }
 
 fun countCommission(
