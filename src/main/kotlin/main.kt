@@ -48,13 +48,17 @@ fun countCommissionVisaMir(
 }
 
 fun countCommissionVkPay(
+    amount: Int,
     totalAmountOfMonth: Int = 0,
     totalAmountOfDay: Int = 0,
 ) {
     when {
         totalAmountOfDay > 15_000 -> println("В операции отказано. Превышен дневной лимит по карте")
         totalAmountOfMonth > 40_000 -> println("В операции отказано. Превышен месячный лимит по карте")
-        else -> println("Комиссия за перевод отсутствует")
+        else -> {
+            println("Сумма перевода составляет: $amount руб.")
+            println("Комиссия за перевод отсутствует")
+        }
     }
 }
 enum class CardType {
