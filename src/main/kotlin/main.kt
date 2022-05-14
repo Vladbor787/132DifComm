@@ -1,66 +1,48 @@
+const val MASTERCARD_MAESTRO_MONTH = 75_000_00
+const val MASTERCARD_MAESTRO_COMMISSION = 0.006
+const val MASTERCARD_MAESTRO_ADD_COMMISSION = 20_00
+const val VISA_MIR_COMMISSION = 0.0075
+const val VISA_MIR_MIN_COMMISSION = 35_00
+const val NO_COMMISSION = 0
+const val MONTH_CARD_LIMIT_EXCEPT_VKPAY = 600_000_00
+const val MONTH_CARD_LIMIT_VKPAY = 40_000_00
+const val DAY_CARD_LIMIT_EXCEPT_VKPAY = 150_000_00
+const val DAY_CARD_LIMIT_VKPAY = 15_000_00
+const val ruble = 100
+
+
 fun main() {
-    countCommission(CardType.Maestro, 75_500, 6_550, 1_000)
-}
-
-fun countCommission(
-    cardType: CardType=CardType.VkPay,
-    totalAmountOfMonth: Int = 0,
-    totalAmountOfDay: Int = 0,
-    amount: Int
-) {
-    when (cardType) {
-        CardType.Mastercard,CardType.Maestro -> countCommissionMastercardMaestro(amount, totalAmountOfMonth, totalAmountOfDay)
-        CardType.Visa,CardType.Mir -> countCommissionVisaMir(amount, totalAmountOfMonth, totalAmountOfDay)
-        CardType.VkPay -> countCommissionVkPay(totalAmountOfMonth, totalAmountOfDay)
+    val cardType = "Visa"
+    val previousMonthAmount = 650100 * ruble
+    val currentTransferAmount = 100 * ruble
+    val totalDay = 0
+    if (checkCardLimit(currentTransferAmount, cardType, previousMonthAmount, totalDay) == 0) {
+        val commission = calculationCommission(cardType,previousMonthAmount,currentTransferAmount )
+        println("Комиссия составит: $commission коп.")
+    }else {
+        println("Операция не возможна.Превышен лимит по карте")
     }
 }
-
-fun countCommissionMastercardMaestro(
-    amount: Int,
-    totalAmountOfMonth: Int = 0,
-    totalAmountOfDay: Int = 0,
-) {
-    when {
-        totalAmountOfDay > 150_000 -> println("В операции отказано. Превышен дневной лимит по карте")
-        totalAmountOfMonth > 600_000 -> println("В операции отказано. Превышен месячный лимит по карте")
-        totalAmountOfMonth > 75_000 -> {
-            println("Сумма перевода составляет: $amount руб.")
-            println("Комиссия за перевод составит: ${(amount * 0.006 + 20.00)*100} коп.")
+fun calculationCommission(cardType: String = "VK Pay", transferAmount: Int,totalMonth: Int = 0): Int {
+    return when (cardType) {
+        "MasterCard", "Maestro" -> {
+            if (totalMonth < MASTERCARD_MAESTRO_MONTH) NO_COMMISSION else
+                (transferAmount * MASTERCARD_MAESTRO_COMMISSION + MASTERCARD_MAESTRO_ADD_COMMISSION).toInt()
         }
-        else -> println("Комиссия за перевод отсутствует")
+        "Visa", "Мир" -> {
+            val commission = transferAmount * VISA_MIR_COMMISSION
+            if (commission < VISA_MIR_MIN_COMMISSION) VISA_MIR_MIN_COMMISSION else commission.toInt()
+        }
+        else -> NO_COMMISSION
     }
 }
 
-fun countCommissionVisaMir(
-    amount: Int,
-    totalAmountOfMonth: Int = 0,
-    totalAmountOfDay: Int = 0,
-) {
-    when {
-        totalAmountOfDay > 150_000 -> println("В операции отказано.  Превышен дневной лимит по карте")
-        totalAmountOfMonth > 600_000 -> println("В операции отказано. Превышен месячный лимит по карте")
-        amount * 0.0075 < 35 -> println("Комиссия за перевод составит 35 руб.")
-        else -> println{
-            println("Сумма перевода составляет: $amount руб.")
-            println("Комиссия за перевод составит ${(amount * 0.0075)*100} коп.")
-        }
+fun checkCardLimit(currentTransferAmount: Int, cardType: String, totalPreviousMonth: Int = 0, totalDay: Int = 0): Int {
+    return when {
+        (totalDay+currentTransferAmount > DAY_CARD_LIMIT_EXCEPT_VKPAY) -> -1
+        (totalPreviousMonth+currentTransferAmount > MONTH_CARD_LIMIT_EXCEPT_VKPAY) -> -2
+        ((cardType == "VK Pay") && (currentTransferAmount > DAY_CARD_LIMIT_VKPAY)) -> -3
+        ((cardType == "VK Pay") && (totalPreviousMonth+currentTransferAmount > MONTH_CARD_LIMIT_VKPAY)) -> -4
+        else -> 0
     }
-}
-
-fun countCommissionVkPay(
-    amount: Int,
-    totalAmountOfMonth: Int = 0,
-    totalAmountOfDay: Int = 0,
-) {
-    when {
-        totalAmountOfDay > 15_000 -> println("В операции отказано. Превышен дневной лимит по карте")
-        totalAmountOfMonth > 40_000 -> println("В операции отказано. Превышен месячный лимит по карте")
-        else -> {
-            println("Сумма перевода составляет: $amount руб.")
-            println("Комиссия за перевод отсутствует")
-        }
-    }
-}
-enum class CardType {
-    Mastercard, Maestro, Visa, Mir, VkPay
 }
