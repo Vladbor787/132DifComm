@@ -11,7 +11,7 @@ class MainKtTest {
 
         val commission = calculationCommission( cardType,transferAmount)
 
-        assertEquals(25 * ruble, commission)
+        assertEquals(35 * ruble, commission)
     }
 
     @Test
