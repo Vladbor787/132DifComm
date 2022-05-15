@@ -13,7 +13,7 @@ const val ruble = 100
 
 fun main() {
     val cardType = "Visa"
-    val previousMonthAmount = 650100 * ruble
+    val previousMonthAmount = 6500 * ruble
     val currentTransferAmount = 100 * ruble
     val totalDay = 0
     if (checkCardLimit(currentTransferAmount, cardType, previousMonthAmount, totalDay) == 0) {
@@ -39,10 +39,10 @@ fun calculationCommission(cardType: String = "VK Pay", transferAmount: Int,total
 
 fun checkCardLimit(currentTransferAmount: Int, cardType: String, totalPreviousMonth: Int = 0, totalDay: Int = 0): Int {
     return when {
-        (totalDay+currentTransferAmount > DAY_CARD_LIMIT_EXCEPT_VKPAY) -> -1
-        (totalPreviousMonth+currentTransferAmount > MONTH_CARD_LIMIT_EXCEPT_VKPAY) -> -2
-        ((cardType == "VK Pay") && (currentTransferAmount > DAY_CARD_LIMIT_VKPAY)) -> -3
-        ((cardType == "VK Pay") && (totalPreviousMonth+currentTransferAmount > MONTH_CARD_LIMIT_VKPAY)) -> -4
+        (totalDay+currentTransferAmount > DAY_CARD_LIMIT_EXCEPT_VKPAY) -> 1
+        (totalPreviousMonth+currentTransferAmount > MONTH_CARD_LIMIT_EXCEPT_VKPAY) -> 2
+        ((cardType == "VK Pay") && (currentTransferAmount > DAY_CARD_LIMIT_VKPAY)) -> 3
+        ((cardType == "VK Pay") && (totalPreviousMonth+currentTransferAmount > MONTH_CARD_LIMIT_VKPAY)) -> 4
         else -> 0
     }
 }
